@@ -1,22 +1,23 @@
-#include <complex.h>
-#include <iostream>
+#include <complex>
+#include <random>
 #include <stdio.h>
-#include <string>
+#include <vector>
+#include "random_Hermitian.h"
 
 // 読み取る行列のサイズ
 #define SIZE 1000
 
-int readtsv(std::string, double _Complex*, int);
+using complex = std::complex<double>;
+using std::vector;
 
 extern "C" {
   double dlamch_(const char& CMACH);
-
   void zheevr_(const char& JOBZ, const char& RANGE, const char& UPLO, const int& N,
-        double _Complex* A, const int& LDA, const double& VL, const double& VU,
-        const int& IL, const int& IU, const double& ABSTOL, int& M, double* W,
-        double _Complex* Z, const int& LDZ, int* ISUPPZ, double _Complex* WORK,
-        const int& LWORK, double* RWORK, const int& LRWORK, int* IWORK,
-        const int& LIWORK, int& INFO);
+               complex* A, const int& LDA, const double& VL, const double& VU,
+               const int& IL, const int& IU, const double& ABSTOL, int& M, double* W,
+               complex* Z, const int& LDZ, int* ISUPPZ, complex* WORK,
+               const int& LWORK, double* RWORK, const int& LRWORK, int* IWORK,
+               const int& LIWORK, int& INFO);
 };
 
 
@@ -33,36 +34,33 @@ int main(){
     double abstol = dlamch_('S');
     int m = SIZE;
     double w[SIZE];
+    vector<complex> z(SIZE*SIZE);
     int ldz = SIZE;
     int isuppz[2*SIZE];
     int info;
 
-    // 行列はサイズが大きくなりうるので new を使ってヒープに確保する
-    auto a = new double _Complex[SIZE*SIZE];
-    auto z = new double _Complex[SIZE*SIZE];
-    info = readtsv("matrix.tsv", a, SIZE*SIZE);
-    if (info != 0){
-        std::cerr << "Exit readtsv with info = " << info << std::endl;
-        return info;
-    }
+    vector<complex> a(SIZE*SIZE);
+    int seed = 123456;
+    std::mt19937 mt(seed);
+    random_Hermitian(a, SIZE, mt);
 
     // 最適な LWORK の計算
-    double _Complex work_temp[1];
+    complex work_temp[1];
     double rwork_temp[1];
     int iwork_temp[1];
-    zheevr_(jobz, range, uplo, n, a, lda, vl, vu, il, iu, abstol, m, w, z, ldz, isuppz,
-            work_temp, -1, rwork_temp, -1, iwork_temp, -1, info);
-    if (info != 0){return info;}
-    int lwork = (int) lround(creal(work_temp[0]));
-    int lrwork = (int) lround(creal(rwork_temp[0]));
-    int liwork = (int) lround(creal(iwork_temp[0]));
-    auto work = new double _Complex[lwork];
-    auto rwork = new double[lrwork];
-    auto iwork = new int[liwork];
+    zheevr_(jobz, range, uplo, n, a.data(), lda, vl, vu, il, iu, abstol, m, w,
+            z.data(), ldz, isuppz, work_temp, -1, rwork_temp, -1, iwork_temp, -1, info);
+    int lwork = (int) work_temp[0].real();
+    int lrwork = (int) rwork_temp[0];
+    int liwork = iwork_temp[0];
+    vector<complex> work(lwork);
+    vector<double> rwork(lrwork);
+    vector<int> iwork(liwork);
 
     // 対角化処理
-    zheevr_(jobz, range, uplo, n, a, lda, vl, vu, il, iu, abstol, m, w, z, ldz,
-            isuppz, work, lwork, rwork, lrwork, iwork, liwork, info);
+    zheevr_(jobz, range, uplo, n, a.data(), lda, vl, vu, il, iu, abstol, m, w,
+            z.data(), ldz, isuppz, work.data(), lwork, rwork.data(), lrwork,
+            iwork.data(), liwork, info);
 
     printf("Exit with info = %d\n", info);
     printf("w[0] = %f\n", w[0]);
@@ -70,12 +68,6 @@ int main(){
     printf("...\n");
     printf("w[%d] = %f\n", SIZE-2, w[SIZE-2]);
     printf("w[%d] = %f\n", SIZE-1, w[SIZE-1]);
-
-    delete[] a;
-    delete[] z;
-    delete[] work;
-    delete[] rwork;
-    delete[] iwork;
     return info;
 }
 

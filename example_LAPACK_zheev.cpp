@@ -1,18 +1,19 @@
-#include <complex.h>
-#include <iostream>
+#include <complex>
+#include <random>
 #include <stdio.h>
-#include <string>
+#include <vector>
+#include "random_Hermitian.h"
 
 // 読み取る行列のサイズ
 #define SIZE 1000
 
-int readtsv(const std::string, double _Complex*, const int);
+using complex = std::complex<double>;
+using std::vector;
 
 extern "C" {
-  void zheev_(const char& JOBZ, const char& UPLO, const int& N,
-              double _Complex* A, const int& LDA, double* W,
-              double _Complex* WORK, const int& LWORK, double* RWORK,
-              int& INFO);
+  void zheev_(const char& JOBZ, const char& UPLO, const int& N, complex* A,
+              const int& LDA, double* W, complex* WORK, const int& LWORK,
+              double* RWORK, int& INFO);
 };
 
 
@@ -25,22 +26,19 @@ int main(){
     double rwork[3*SIZE - 2];
     int info;
 
-    // 行列はサイズが大きくなりうるので new を使ってヒープに確保する
-    auto a = new double _Complex[SIZE*SIZE];
-    info = readtsv("matrix.tsv", a, SIZE*SIZE);
-    if (info != 0){
-        std::cerr << "Exit readtsv with info = " << info << std::endl;
-        return info;
-    }
+    vector<complex> a(SIZE*SIZE);
+    int seed = 123456;
+    std::mt19937 mt(seed);
+    random_Hermitian(a, SIZE, mt);
 
     // 最適な LWORK の計算
-    double _Complex work_temp[1];
-    zheev_(jobz, uplo, n, a, lda, w, work_temp, -1, rwork, info);
-    int lwork = (int) lround(creal(work_temp[0]));
-    auto work = new double _Complex[lwork];
+    complex work_temp[1];
+    zheev_(jobz, uplo, n, a.data(), lda, w, work_temp, -1, rwork, info);
+    int lwork = (int) work_temp[0].real();
+    vector<complex> work(lwork);
 
     // 対角化処理
-    zheev_(jobz, uplo, n, a, lda, w, work, lwork, rwork, info);
+    zheev_(jobz, uplo, n, a.data(), lda, w, work.data(), lwork, rwork, info);
 
     printf("Exit with info = %d\n", info);
     printf("w[0] = %f\n", w[0]);
@@ -48,8 +46,5 @@ int main(){
     printf("...\n");
     printf("w[%d] = %f\n", SIZE-2, w[SIZE-2]);
     printf("w[%d] = %f\n", SIZE-1, w[SIZE-1]);
-
-    delete[] a;
-    delete[] work;
     return info;
 }

@@ -21,7 +21,7 @@ extern "C" {
 };
 
 
-int main(){
+int main() {
     char jobz = 'V';
     char uplo = 'U';
     int n = SIZE;
@@ -40,7 +40,7 @@ int main(){
     std::mt19937 mt(seed);
     std::chrono::system_clock::time_point start, end;
     double elapsed;
-    for (int i; i<NTEST; i++){
+    for (int i; i<NTEST; i++) {
         random_Hermitian(a, SIZE, mt);
         start = std::chrono::system_clock::now();
         zheev_(jobz, uplo, n, a.data(), lda, w, work.data(), lwork, rwork, info);

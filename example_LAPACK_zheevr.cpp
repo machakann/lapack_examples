@@ -21,7 +21,7 @@ extern "C" {
 };
 
 
-int main(){
+int main() {
     char jobz = 'V';
     char range = 'A';
     char uplo = 'U';

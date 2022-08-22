@@ -17,7 +17,7 @@ extern "C" {
 };
 
 
-int main(){
+int main() {
     char jobz = 'V';
     char uplo = 'U';
     int n = SIZE;

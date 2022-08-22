@@ -56,7 +56,7 @@ int main() {
     std::mt19937 mt(seed);
     std::chrono::system_clock::time_point start, end;
     double elapsed;
-    for (int i; i<NTEST; i++) {
+    for (int i = 0; i<NTEST; i++) {
         random_Hermitian(a, SIZE, mt);
         start = std::chrono::system_clock::now();
         zheevx_(jobz, range, uplo, n, a.data(), lda, vl, vu, il, iu, abstol, m,

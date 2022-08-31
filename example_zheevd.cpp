@@ -4,9 +4,6 @@
 #include <vector>
 #include "random_Hermitian.h"
 
-// 読み取る行列のサイズ
-#define SIZE 1000
-
 using complex = std::complex<double>;
 using std::vector;
 
@@ -19,6 +16,7 @@ extern "C" {
 
 
 int main() {
+    constexpr int SIZE = 1000;
     char jobz = 'V';
     char uplo = 'U';
     int n = SIZE;

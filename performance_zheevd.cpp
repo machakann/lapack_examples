@@ -5,12 +5,6 @@
 #include <vector>
 #include "random_Hermitian.h"
 
-// 試行回数
-#define NTEST 10
-
-// 読み取る行列のサイズ
-#define SIZE 1000
-
 using complex = std::complex<double>;
 using std::vector;
 
@@ -23,6 +17,8 @@ extern "C" {
 
 
 int main() {
+    constexpr int NTEST = 10;
+    constexpr int SIZE = 1000;
     char jobz = 'V';
     char uplo = 'U';
     int n = SIZE;

@@ -1,7 +1,7 @@
 #include <chrono>
 #include <complex>
+#include <iostream>
 #include <random>
-#include <stdio.h>
 #include <vector>
 #include "random_Hermitian.h"
 
@@ -36,13 +36,14 @@ int main() {
     std::mt19937 mt(seed);
     std::chrono::system_clock::time_point start, end;
     double elapsed;
+    std::cout.precision(8);
     for (int i = 0; i<NTEST; i++) {
         random_Hermitian(a, SIZE, mt);
         start = std::chrono::system_clock::now();
         zheev_(jobz, uplo, n, a.data(), lda, w, work.data(), lwork, rwork, info);
         end = std::chrono::system_clock::now();
         elapsed = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0);
-        printf("%18.15lf\n", elapsed);
+        std::cout << elapsed << std::endl;
     }
     return 0;
 }

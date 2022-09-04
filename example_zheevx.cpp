@@ -1,6 +1,6 @@
 #include <complex>
+#include <iostream>
 #include <random>
-#include <stdio.h>
 #include <vector>
 #include "random_Hermitian.h"
 
@@ -56,11 +56,11 @@ int main() {
     zheevx_(jobz, range, uplo, n, a.data(), lda, vl, vu, il, iu, abstol, m, w,
             z.data(), ldz, work.data(), lwork, rwork, iwork, ifail, info);
 
-    printf("Exit with info = %d\n", info);
-    printf("w[0] = %f\n", w[0]);
-    printf("w[1] = %f\n", w[1]);
-    printf("...\n");
-    printf("w[%d] = %f\n", SIZE-2, w[SIZE-2]);
-    printf("w[%d] = %f\n", SIZE-1, w[SIZE-1]);
+    std::cout << "Exit with info = " << info << std::endl;
+    std::cout << "w[0] = " << w[0] << std::endl;
+    std::cout << "w[1] = " << w[1] << std::endl;
+    std::cout << "..." << std::endl;
+    std::cout << "w[" << SIZE-2 << "] = " << w[SIZE-2] << std::endl;
+    std::cout << "w[" << SIZE-1 << "] = " << w[SIZE-1] << std::endl;
     return info;
 }

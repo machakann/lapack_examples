@@ -16,7 +16,7 @@ extern "C" {
 
 int main() {
     using std::vector;
-    constexpr int NTEST = 10;
+    constexpr int NTEST = 50;
     constexpr int SIZE = 1000;
     char jobz = 'V';
     char uplo = 'U';

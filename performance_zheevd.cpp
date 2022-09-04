@@ -6,7 +6,6 @@
 #include "random_Hermitian.h"
 
 using complex = std::complex<double>;
-using std::vector;
 
 extern "C" {
   void zheevd_(const char& JOBZ, const char& UPLO, const int& N, complex* A,
@@ -17,6 +16,7 @@ extern "C" {
 
 
 int main() {
+    using std::vector;
     constexpr int NTEST = 10;
     constexpr int SIZE = 1000;
     char jobz = 'V';
